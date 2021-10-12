@@ -52,12 +52,21 @@ public class Cmd {
                 '}';
     }
 
+    public void printInfo() {
+        System.out.println(toString());
+    }
+
     private void _reset() {
-        this._options = new ArrayList<>();
-        this._urls = new ArrayList<>();
+        _options = new ArrayList<>();
+        _urls = new ArrayList<>();
+    }
+
+    private void _checkOptionStrs() {
+        if (_optionStrs == null || _optionStrs.length == 0) CmdException.EmptyCommand();
     }
 
     private void _parse() {
+        _checkOptionStrs();
         _parseName();
         _parseOptions();
         _parseUrls();
@@ -89,7 +98,8 @@ public class Cmd {
         // name idx:
         int nameStartIdx = -1, nameEndIdx = -1, gapIdx = -1, valueStartIdx = -1;
         if (optionStr.startsWith(OPTION_START)) nameStartIdx = OPTION_START.length();
-        else if (optionStr.startsWith(OPTION_START_ALIAS)) nameStartIdx = OPTION_START_ALIAS.length();
+        else if (optionStr.startsWith(OPTION_START_ALIAS))
+            nameStartIdx = OPTION_START_ALIAS.length();
         else return new String[]{null, null};
         // gap:
         gapIdx = optionStr.indexOf(OPTION_NAME_VALUE_GAP);

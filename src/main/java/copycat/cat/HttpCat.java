@@ -1,13 +1,19 @@
 package copycat.cat;
 
 import copycat.cmd.option.Option;
+import copycat.infra.Http;
 
 import java.util.List;
 
 public class HttpCat implements Cat {
     public static void get(List<Option> options, List<String> urls) {
         for (String url : urls) {
-            System.out.println("\n\n[HTT_CAT] Get: " + url + "\n\n");
+            get(options, url);
         }
+    }
+
+    public static void get(List<Option> options, String url) {
+        System.out.println("\n\n[HTT_CAT_GET] " + url + "\n\n");
+        Http.get(options, url);
     }
 }

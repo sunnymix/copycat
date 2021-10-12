@@ -1,6 +1,7 @@
 package copycat.cmd.option;
 
 import copycat.cmd.CmdException;
+import copycat.cmd.option.options.HeaderOption;
 import copycat.cmd.option.options.ProtocolOption;
 
 import java.lang.reflect.Constructor;
@@ -10,6 +11,7 @@ public class OptionFactory {
     static {
         _options = new HashMap<>();
         add(new ProtocolOption(null));
+        add(new HeaderOption(null));
     }
 
     private static final Map<String, Option> _options;

@@ -7,11 +7,8 @@ import copycat.cmd.Cmd;
  */
 public class Copycat {
     public static void main(String[] args) {
-        Cmd.help();
-
         Cmd cmd = new Cmd(args);
-        System.out.println(cmd.toString());
-
+        cmd.printInfo();
         cmd.run();
     }
 }
