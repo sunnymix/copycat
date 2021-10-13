@@ -5,11 +5,11 @@ public class Doc {
         new Doc("/tmp/copycat/doc", "test", Ext.MD).save("# Test");
     }
 
-    private final String dir;
+    public final String dir;
 
-    private final String name;
+    public final String name;
 
-    private final Ext ext;
+    public final Ext ext;
 
     public Doc(String dir, String name, Ext ext) {
         this.dir = dir;
@@ -26,16 +26,13 @@ public class Doc {
     }
 
     public enum Ext {
+        TXT("txt"),
         MD("md");
 
-        private final String id;
+        public final String id;
 
         Ext(String id) {
             this.id = id;
-        }
-
-        public String getText() {
-            return id;
         }
     }
 }
