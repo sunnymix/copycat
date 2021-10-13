@@ -5,11 +5,11 @@ public class Doc {
         new Doc("/tmp/copycat/doc", "test", Ext.MD).save("# Test");
     }
 
-    private String dir;
+    private final String dir;
 
-    private String name;
+    private final String name;
 
-    private Ext ext;
+    private final Ext ext;
 
     public Doc(String dir, String name, Ext ext) {
         this.dir = dir;
