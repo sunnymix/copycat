@@ -25,6 +25,8 @@ public class Http {
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
             String name = Html.Title.fromHtml(body.substring(0, 1000)).trim();
             new File("/tmp/copycat/doc/" + name, name, File.Ext.HTML).save(body);
+            String md = Md.fromHtml(body);
+            new File("/tmp/copycat/doc/" + name, "_index", File.Ext.MD).save(md);
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
