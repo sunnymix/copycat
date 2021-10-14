@@ -2,10 +2,12 @@ package copycat.infra;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+
 public class Md {
     private static final String[] PRE_TOKENS = new String[]{
-            "TFL.markdown({",
-            "\"value\"",
+            "wiki_dom = {\"dome\"",
             ":",
             "\""
     };
@@ -46,6 +48,7 @@ public class Md {
     private static String _decode(String s) {
         s = _decodeEOL(s);
         s = _decodeUnicode(s);
+        s = _decodeUrl(s);
         return s;
     }
 
@@ -55,5 +58,13 @@ public class Md {
 
     private static String _decodeUnicode(String s) {
         return StringEscapeUtils.unescapeJava(s);
+    }
+
+    private static String _decodeUrl(String s) {
+        try {
+            s = URLDecoder.decode(s, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+        }
+        return s;
     }
 }

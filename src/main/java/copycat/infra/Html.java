@@ -1,32 +1,43 @@
 package copycat.infra;
 
 public class Html {
-    public static final String HEAD_TAG = "<head>";
-    public static final String TITLE_TAG = "<title>";
-    public static final String TITLE_TAG_END = "</title>";
-
     public static class Title {
-        private static final String[] TITLE_PRE_REMOVE = new String[]{
-                "编辑wiki-文档_"
+        private static final String[] PRE_TOKENS = new String[]{
+                "id=\"wikiName\"",
+                "title=\""
         };
 
-        private static final String[] TITLE_TAIL_REMOVE = new String[]{
-                "-TAPD平台"
-        };
+        private static final String TAIL_TOKEN = "\"";
+
+        private static final String[] TITLE_PRE_REMOVE = new String[]{};
+
+        private static final String[] TITLE_TAIL_REMOVE = new String[]{};
 
         public static String fromHtml(String html) {
             String title = "";
-            int headTag = html.indexOf(HEAD_TAG);
-            int titleTag = html.indexOf(TITLE_TAG, headTag);
-            if (titleTag > 0) {
-                int titleTagEnd = html.indexOf(TITLE_TAG_END, titleTag);
-                if (titleTagEnd > headTag) {
-                    title = html.substring(titleTag + TITLE_TAG.length(), titleTagEnd);
-                }
+            int start = _getStart(html), end = -1;
+            if (start >= 0) {
+                end = html.indexOf(TAIL_TOKEN, start);
+            }
+            if (end > start) {
+                title = html.substring(start, end);
             }
             title = _removeTitlePre(TITLE_PRE_REMOVE, title, true);
             title = _removeTitlePre(TITLE_TAIL_REMOVE, title, false);
             return title.trim();
+        }
+
+        private static int _getStart(String s) {
+            int idx, from = -1;
+            for (String token : PRE_TOKENS) {
+                idx = s.indexOf(token, from);
+                if (idx >= 0) {
+                    from = idx + token.length();
+                } else {
+                    break;
+                }
+            }
+            return from;
         }
 
         private static String _removeTitlePre(String[] filters, String title, boolean preOrTail) {
