@@ -1,6 +1,8 @@
 package copycat.infra;
 
 import copycat.cmd.option.Option;
+import copycat.cmd.option.Options;
+import copycat.cmd.option.options.DirOption;
 import copycat.cmd.option.options.HeaderOption;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,10 +25,9 @@ public class Http {
             int statusCode = res.getStatusLine().getStatusCode();
             System.out.println("Stats: " + statusCode);
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
-            String name = Html.Title.fromHtml(body.substring(0, 1000)).trim();
-            new File("/tmp/copycat/doc/" + name, name, File.Ext.HTML).save(body);
-            String md = Md.fromHtml(body);
-            new File("/tmp/copycat/doc/" + name, "_index", File.Ext.MD).save(md);
+            if (statusCode == 200) {
+                _save(options, body);
+            }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -38,6 +39,15 @@ public class Http {
             } catch (IOException e) {
             }
         }
+    }
+
+    private static void _save(List<Option> options, String body) {
+        Option dirOption = Options.get(options, DirOption.NAME);
+        String dir = dirOption != null ? dirOption.value() : "/tmp/copycat/doc/";
+        String name = Html.Title.fromHtml(body.substring(0, 1000)).trim();
+        new File(dir + name, name, File.Ext.HTML).save(body);
+        String md = Md.fromHtml(body);
+        new File(dir + name, "_index", File.Ext.MD).save(md);
     }
 
     private static void _setHeaders(HttpGet get, List<Option> options) {

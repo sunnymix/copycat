@@ -50,7 +50,7 @@ public class File {
     }
 
     public String filePath() {
-        return String.format("%s/%s.%s", dir, name, ext.id);
+        return String.format("%s/%s.%s", dirPath(), name, ext.id);
     }
 
     private void _createDir() {
