@@ -1,5 +1,6 @@
 package copycat.infra;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
@@ -54,13 +55,37 @@ public class File {
     }
 
     private void _createDir() {
-        F f = new F(dirPath());
+        FileProxy f = new FileProxy(dirPath());
         f.mkdirs();
     }
 
     private void _resetFile() {
         _createDir();
-        F f = new F(filePath());
+        FileProxy f = new FileProxy(filePath());
         f.createNewFile();
+    }
+
+    private static class FileProxy {
+        private final java.io.File file;
+
+        public FileProxy(String path) {
+            file = new java.io.File(path);
+        }
+
+        public void createNewFile() {
+            if (!file.exists()) {
+                try {
+                    boolean ok = file.createNewFile();
+                } catch (IOException e) {
+                    System.out.println("Cannot create file");
+                }
+            }
+        }
+
+        public void mkdirs() {
+            if (!file.exists()) {
+                boolean ok = file.mkdirs();
+            }
+        }
     }
 }
