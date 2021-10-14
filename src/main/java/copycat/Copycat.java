@@ -7,7 +7,9 @@ import copycat.cmd.Cmd;
  */
 public class Copycat {
     public static void main(String[] args) {
-        Cmd cmd = new Cmd(args);
+        String cmdline = String.join(" ", args);
+        System.out.println(cmdline);
+        Cmd cmd = new Cmd(cmdline);
         cmd.printInfo();
         cmd.run();
     }

@@ -32,13 +32,6 @@ public class Cmd {
         _parse();
     }
 
-    public Cmd(String[] args) {
-        _reset();
-        _cmd = String.join(" ", args);
-        _optionStrs = args;
-        _parse();
-    }
-
     public void run() {
         CmdRunner.run(_options, _urls);
     }

@@ -20,9 +20,11 @@ public class Http {
         CloseableHttpResponse res = null;
         try {
             res = client.execute(get);
-            System.out.println(res.getStatusLine().getStatusCode());
+            int statusCode = res.getStatusLine().getStatusCode();
+            System.out.println("Stats: " + statusCode);
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
-            System.out.println(body);
+            String name = Html.Title.fromHtml(body.substring(0, 1000)).trim();
+            new File("/tmp/copycat/doc/" + name, name, File.Ext.HTML).save(body);
         } catch (ClientProtocolException e) {
             e.printStackTrace();
         } catch (IOException e) {
