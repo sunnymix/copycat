@@ -1,3 +1,0 @@
-cat: catches original content
-1. Cat: basic interface for all the catchers
-2. HttpCat: catcher bases on Http protocol
