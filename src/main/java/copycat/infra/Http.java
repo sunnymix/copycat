@@ -66,7 +66,7 @@ public class Http {
         String name = Html.Title.fromHtml(body.substring(0, 1000)).trim();
         String dir = baseDir + name + "/";
         // save html file:
-        new File(dir, name, File.Ext.HTML).save(body);
+        new File(dir, "_index", File.Ext.HTML).save(body);
         // get md:
         String md = Md.fromHtml(body);
         // get images in md:
@@ -150,18 +150,18 @@ public class Http {
     }
 
     public static void main(String[] args) {
-        String s = String.join("\n", new String[]{
-                "![](https://pubimg.xingren.com/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)",
-                "![num1](https://pubimg.xingren.com/6bcb5fb9-12b4-40f9-a4cf-cd1ecf59e56a.png);",
-                "![num2](https://pubimg.xingren.com/ab41f8cc-dbc0-4a9b-8b77-1ce597114db8.png);",
-                "![num3](https://pubimg.xingren.com/4a67d3c2-fa3b-456f-9c52-b3af2d46bb2b.png);"
-        });
+//        String s = String.join("\n", new String[]{
+//                "![](https://pubimg.xingren.com/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)",
+//                "![num1](https://pubimg.xingren.com/6bcb5fb9-12b4-40f9-a4cf-cd1ecf59e56a.png);",
+//                "![num2](https://pubimg.xingren.com/ab41f8cc-dbc0-4a9b-8b77-1ce597114db8.png);",
+//                "![num3](https://pubimg.xingren.com/4a67d3c2-fa3b-456f-9c52-b3af2d46bb2b.png);"
+//        });
+//
+//        List<Image> images = _getImagesInMd(s, "https://pubimg.xingren.com");
+//        for (Image image : images) {
+//            System.out.println(image);
+//        }
 
-        List<Image> images = _getImagesInMd(s, "https://pubimg.xingren.com");
-        for (Image image : images) {
-            System.out.println(image);
-        }
-
-        _downloadImage("/tmp/copycat/doc/", new Image("![](/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)", "https://pubimg.xingren.com"), new ArrayList<>());
+        _downloadImage("/tmp/copycat/doc/", new Image("![](http://img.llc687.top/uPic/截屏2020-05-31下午2.53.34.png)", "https://pubimg.xingren.com"), new ArrayList<>());
     }
 }

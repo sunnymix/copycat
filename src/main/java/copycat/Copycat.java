@@ -4,6 +4,9 @@ import copycat.cmd.Cmd;
 
 /**
  * Copycat command line application
+ *
+ * TODO:
+ * - Command line, use --option pattern instead of space pattern to split the args
  */
 public class Copycat {
     public static void main(String[] args) {

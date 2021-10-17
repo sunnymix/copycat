@@ -48,15 +48,15 @@ public class Image {
             }
         }
         // init properties:
-        this.ref = ref;
+        this.ref = UrlUtils.decode(ref);
         this.file = null;
         if (start >= 0 && idx >= 0 && end > start && values.size() == 2) {
             this.start = start;
             this.end = end;
             this.str = s.substring(this.start, this.end);
             this.title = values.get(0);
-            this.originalUrl = values.get(1);
-            this.url = _fillUrlSite(this.originalUrl, ref);
+            this.originalUrl = UrlUtils.decode(values.get(1));
+            this.url = _fillUrlSite(this.originalUrl, ref).trim();
             this.attachInRef = UrlUtils.sameSite(this.url, ref);
         } else {
             this.start = -1;
@@ -82,7 +82,7 @@ public class Image {
         if (name == null) {
             name = UUID.randomUUID().toString();
         }
-        return name;
+        return "_res/" + name;
     }
 
     @Override
@@ -104,7 +104,7 @@ public class Image {
     }
 
     public static void main(String[] args) {
-        Image image = new Image("![](/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)", "https://pubimg.xingren.com");
+        Image image = new Image("![](http://img.llc687.top/uPic/%E6%88%AA%E5%B1%8F2020-05-26%E4%B8%8A%E5%8D%889.55.06.png)", "https://pubimg.xingren.com");
         System.out.println(image);
         System.out.println(image.fileName());
     }
