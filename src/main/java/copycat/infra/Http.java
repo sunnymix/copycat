@@ -35,7 +35,7 @@ public class Http {
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
             System.out.println("Stats: " + statusCode);
             if (statusCode == HttpStatus.SC_OK) {
-                _saveHtmlAndMd(options, body);
+                _saveHtmlAndMd(options, body, url);
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -59,7 +59,7 @@ public class Http {
         });
     }
 
-    private static void _saveHtmlAndMd(List<Option> options, String body) {
+    private static void _saveHtmlAndMd(List<Option> options, String body, String url) {
         Option dirOption = Options.get(options, DirOption.NAME);
         String baseDir = dirOption != null ? dirOption.value() : "/tmp/copycat/doc/";
         // get dir, name:
@@ -70,20 +70,20 @@ public class Http {
         // get md:
         String md = Md.fromHtml(body);
         // get images in md:
-        List<Image> images = _getImagesInMd(md);
+        List<Image> images = _getImagesInMd(md, url);
         // save images files:
-        md = _downloadImages(dir, md, images);
+        md = _downloadImages(dir, md, images, options);
         // replace images:
         md = _replaceImages(md, images);
         // save md file:
         new File(dir, "_index", File.Ext.MD).save(md);
     }
 
-    private static List<Image> _getImagesInMd(String md) {
+    private static List<Image> _getImagesInMd(String md, String ref) {
         List<Image> images = new ArrayList<>();
         int idx = 0;
         while (idx < md.length()) {
-            Image image = new Image(md);
+            Image image = new Image(md, ref);
             if (image.end > 0) {
                 images.add(image);
                 md = md.substring(image.end);
@@ -94,19 +94,22 @@ public class Http {
         return images;
     }
 
-    private static String _downloadImages(String dir, String md, List<Image> images) {
+    private static String _downloadImages(String dir, String md, List<Image> images, List<Option> options) {
         if (!images.isEmpty()) {
             for (Image image : images) {
-                _downloadImage(dir, image);
+                _downloadImage(dir, image, options);
             }
         }
         return md;
     }
 
-    private static void _downloadImage(String dir, Image image) {
+    private static void _downloadImage(String dir, Image image, List<Option> options) {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet req = new HttpGet(image.url);
         req.setHeader(UA, UA_CHROME);
+        if (image.attachInRef) {
+            _setRequestHeaders(req, options);
+        }
         req.setConfig(_reqConf());
         CloseableHttpResponse res = null;
         try {
@@ -154,11 +157,11 @@ public class Http {
                 "![num3](https://pubimg.xingren.com/4a67d3c2-fa3b-456f-9c52-b3af2d46bb2b.png);"
         });
 
-        List<Image> images = _getImagesInMd(s);
+        List<Image> images = _getImagesInMd(s, "https://pubimg.xingren.com");
         for (Image image : images) {
             System.out.println(image);
         }
 
-        _downloadImage("/tmp/copycat/doc/", new Image("![](https://pubimg.xingren.com/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)"));
+        _downloadImage("/tmp/copycat/doc/", new Image("![](/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)", "https://pubimg.xingren.com"), new ArrayList<>());
     }
 }

@@ -1,5 +1,7 @@
 package copycat.infra;
 
+import copycat.common.UrlUtils;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -21,9 +23,13 @@ public class Image {
 
     public final String url;
 
+    public final String ref;
+
+    public final boolean attachInRef;
+
     public String file;
 
-    public Image(String s) {
+    public Image(String s, String ref) {
         int start = -1, idx = -1, end = -1;
         List<String> values = new ArrayList<>();
         for (int i = 0; i < TOKENS.length; i++) {
@@ -39,20 +45,25 @@ public class Image {
                 }
             }
         }
+        // init properties:
+        this.ref = ref;
+        this.file = null;
         if (start >= 0 && idx >= 0 && end > start && values.size() == 2) {
             this.start = start;
             this.end = end;
             this.str = s.substring(this.start, this.end);
             this.title = values.get(0);
-            this.url = values.get(1);
+            String originalUrl = values.get(1);
+            this.url = _fillUrlSite(originalUrl, ref);
+            this.attachInRef = UrlUtils.sameSite(this.url, ref);
         } else {
             this.start = -1;
             this.end = -1;
             this.str = null;
             this.title = null;
             this.url = null;
+            this.attachInRef = false;
         }
-        this.file = null;
     }
 
     public String fileName() {
@@ -77,11 +88,20 @@ public class Image {
                 "str='" + str + '\'' +
                 ", title='" + title + '\'' +
                 ", url='" + url + '\'' +
+                ", file='" + file + '\'' +
+                ", attachInRef='" + attachInRef + '\'' +
                 '}';
     }
 
+    private String _fillUrlSite(String url, String ref) {
+        if (!url.startsWith("http") || url.startsWith("/")) {
+            return UrlUtils.getSite(ref) + url;
+        }
+        return url;
+    }
+
     public static void main(String[] args) {
-        Image image = new Image("![](https://pubimg.xingren.com/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)");
+        Image image = new Image("![](/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)", "https://pubimg.xingren.com");
         System.out.println(image);
         System.out.println(image.fileName());
     }
