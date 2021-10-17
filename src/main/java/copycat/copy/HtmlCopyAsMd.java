@@ -1,4 +1,4 @@
 package copycat.copy;
 
-public class CopyHtmlAsMd {
+public class HtmlCopyAsMd {
 }
