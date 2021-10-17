@@ -14,7 +14,10 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.0'
     // HttpClient
     implementation 'org.apache.httpcomponents:httpclient:4.3.5'
+    // Common
     implementation 'org.apache.commons:commons-lang3:3.12.0'
+    // IO
+    implementation 'commons-io:commons-io:2.4'
 }
 
 test {

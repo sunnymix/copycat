@@ -1,10 +1,13 @@
 package copycat.infra;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class Image {
-    private static String[] TOKENS = new String[]{
+    private final static String[] TOKENS = new String[]{
             "![", "](", ")"
     };
 
@@ -49,6 +52,22 @@ public class Image {
         }
     }
 
+    public String fileName() {
+        String name = null;
+        try {
+            URL url = new URL(this.url);
+            name = String.format("%s-%s",
+                    url.getHost().replace(".", "-"),
+                    url.getPath().replace("/", "-"));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        if (name == null) {
+            name = UUID.randomUUID().toString();
+        }
+        return name;
+    }
+
     @Override
     public String toString() {
         return "Image{" +
@@ -61,5 +80,6 @@ public class Image {
     public static void main(String[] args) {
         Image image = new Image("![](https://pubimg.xingren.com/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)");
         System.out.println(image);
+        System.out.println(image.fileName());
     }
 }

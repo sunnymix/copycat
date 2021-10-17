@@ -5,10 +5,6 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
 public class File {
-    public static void main(String[] args) {
-        new File("/tmp/copycat/doc", "test", Ext.MD).save("# Test");
-    }
-
     public final String dir;
 
     public final String name;
@@ -28,7 +24,7 @@ public class File {
     }
 
     public File(String dir, String name, Ext ext) {
-        this.dir = dir;
+        this.dir = dir.endsWith("/") ? dir : dir + "/";
         this.name = name;
         this.ext = ext;
     }
@@ -42,20 +38,12 @@ public class File {
         }
     }
 
-    public String dirPath() {
-        String path = dir;
-        while (path.endsWith("/")) {
-            path = path.substring(0, path.length() - 1);
-        }
-        return path;
-    }
-
     public String filePath() {
-        return String.format("%s/%s.%s", dirPath(), name, ext.id);
+        return String.format("%s%s.%s", dir, name, ext.id);
     }
 
     private void _createDir() {
-        FileProxy f = new FileProxy(dirPath());
+        FileProxy f = new FileProxy(dir);
         f.mkdirs();
     }
 
@@ -87,5 +75,9 @@ public class File {
                 boolean ok = file.mkdirs();
             }
         }
+    }
+
+    public static void main(String[] args) {
+        new File("/tmp/copycat/doc/", "test", Ext.MD).save("# Test");
     }
 }
