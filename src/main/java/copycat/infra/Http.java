@@ -16,10 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Http {
-    public static void get(List<Option> options, String url) throws RuntimeException {
+    public static void getHtmlAndMd(List<Option> options, String url) throws RuntimeException {
         CloseableHttpClient client = HttpClients.createDefault();
         HttpGet get = new HttpGet(url);
-        _setHeaders(get, options);
+        _setRequestHeaders(get, options);
         CloseableHttpResponse res = null;
         try {
             res = client.execute(get);
@@ -27,7 +27,7 @@ public class Http {
             System.out.println("Stats: " + statusCode);
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
             if (statusCode == 200) {
-                _save(options, body);
+                _saveHtmlAndMd(options, body);
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -42,7 +42,16 @@ public class Http {
         }
     }
 
-    private static void _save(List<Option> options, String body) {
+    private static void _setRequestHeaders(HttpGet get, List<Option> options) {
+        options.stream().filter(o -> o instanceof HeaderOption).forEach(o -> {
+            String[] nameAndValue = ((HeaderOption) o).parseNameAndValue();
+            if (nameAndValue.length == 2) {
+                get.setHeader(nameAndValue[0], nameAndValue[1]);
+            }
+        });
+    }
+
+    private static void _saveHtmlAndMd(List<Option> options, String body) {
         Option dirOption = Options.get(options, DirOption.NAME);
         String baseDir = dirOption != null ? dirOption.value() : "/tmp/copycat/doc/";
         // get dir, name:
@@ -53,23 +62,14 @@ public class Http {
         // get md:
         String md = Md.fromHtml(body);
         // get images in md:
-        List<Image> images = _getImages(md);
+        List<Image> images = _getImagesInMd(md);
         // save images files:
         md = _downloadImages(dir, md, images);
         // save md file:
         new File(dir, "_index", File.Ext.MD).save(md);
     }
 
-    private static void _setHeaders(HttpGet get, List<Option> options) {
-        options.stream().filter(o -> o instanceof HeaderOption).forEach(o -> {
-            String[] nameAndValue = ((HeaderOption) o).parseNameAndValue();
-            if (nameAndValue.length == 2) {
-                get.setHeader(nameAndValue[0], nameAndValue[1]);
-            }
-        });
-    }
-
-    private static List<Image> _getImages(String md) {
+    private static List<Image> _getImagesInMd(String md) {
         List<Image> images = new ArrayList<>();
         int idx = 0;
         while (idx < md.length()) {
@@ -96,7 +96,7 @@ public class Http {
                 "![num3](https://pubimg.xingren.com/4a67d3c2-fa3b-456f-9c52-b3af2d46bb2b.png);"
         });
 
-        List<Image> images = _getImages(s);
+        List<Image> images = _getImagesInMd(s);
         for (Image image : images) {
             System.out.println(image);
         }
