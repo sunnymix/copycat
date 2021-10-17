@@ -21,6 +21,8 @@ public class Image {
 
     public final String title;
 
+    public final String originalUrl;
+
     public final String url;
 
     public final String ref;
@@ -53,14 +55,15 @@ public class Image {
             this.end = end;
             this.str = s.substring(this.start, this.end);
             this.title = values.get(0);
-            String originalUrl = values.get(1);
-            this.url = _fillUrlSite(originalUrl, ref);
+            this.originalUrl = values.get(1);
+            this.url = _fillUrlSite(this.originalUrl, ref);
             this.attachInRef = UrlUtils.sameSite(this.url, ref);
         } else {
             this.start = -1;
             this.end = -1;
             this.str = null;
             this.title = null;
+            this.originalUrl = null;
             this.url = null;
             this.attachInRef = false;
         }

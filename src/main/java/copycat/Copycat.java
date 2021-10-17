@@ -8,7 +8,7 @@ import copycat.cmd.Cmd;
 public class Copycat {
     public static void main(String[] args) {
         String cmdline = String.join(" ", args);
-        System.out.println(cmdline);
+        System.out.printf("\n==========\nArgs:\n%s\n==========\n\n", cmdline);
         Cmd cmd = new Cmd(cmdline);
         cmd.printInfo();
         cmd.run();

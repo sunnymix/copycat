@@ -138,7 +138,7 @@ public class Http {
 
     private static String _replaceImages(String md, List<Image> images) {
         for (Image image : images) {
-            md = md.replace(image.url, image.file);
+            md = md.replace(image.originalUrl, image.file);
         }
         return md;
     }
