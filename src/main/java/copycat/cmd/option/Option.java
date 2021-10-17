@@ -11,6 +11,6 @@ public abstract class Option {
 
     @Override
     public String toString() {
-        return String.format("%s=%s", name(), value());
+        return String.format("Option{'%s'='%s'}", name(), value());
     }
 }

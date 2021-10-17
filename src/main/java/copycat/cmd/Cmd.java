@@ -6,12 +6,10 @@ import copycat.cmd.runner.CmdRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Cmd {
-    public static final String NAME = "copycat";
-
-    public static final String OPTIONS_GAP = " ";
-
     public static final String OPTION_START = "--";
     public static final String OPTION_START_ALIAS = "-";
 
@@ -19,17 +17,19 @@ public class Cmd {
 
     private final String _cmd;
 
-    private String[] _optionStrs;
+    private String _action;
 
-    private List<Option> _options;
+    private List<String> _optionStrs;
 
     private List<String> _urls;
+
+    private List<Option> _options;
 
     public Cmd(String cmd) {
         _reset();
         _cmd = cmd;
         _split();
-        _parse();
+        _parseOptions();
     }
 
     public void run() {
@@ -45,44 +45,82 @@ public class Cmd {
                 '}';
     }
 
-    public void printInfo() {
-        System.out.println(toString());
+    public void print() {
+        StringBuilder s = new StringBuilder();
+        s.append("\n");
+        s.append("====================").append("\n");
+        s.append("Cmd").append("\n");
+        s.append("Optional: ").append(_cmd).append("\n");
+        s.append("Action: ").append(_action).append("\n");
+        s.append("Urls: ").append(_urls).append("\n");
+        s.append("Options: ").append("\n");
+        for (Option option : _options) {
+            s.append("    ").append(option.name()).append(": ").append(option.value()).append("\n");
+        }
+        s.append("====================").append("\n");
+        System.out.println(s);
     }
 
     private void _reset() {
+        _action = "";
         _options = new ArrayList<>();
         _urls = new ArrayList<>();
     }
 
-    private void _checkOptionStrs() {
-        if (_optionStrs == null || _optionStrs.length == 0) CmdException.EmptyCommand();
-    }
-
-    private void _parse() {
-        _checkOptionStrs();
-        _parseName();
-        _parseOptions();
-        _parseUrls();
-    }
-
     private void _split() {
-        if (_cmd.isBlank()) CmdException.EmptyCommand();
-        _optionStrs = _cmd.trim().split(OPTIONS_GAP);
-        if (_optionStrs.length == 0) CmdException.EmptyCommand();
-    }
+        if (_cmd.isBlank()) {
+            CmdException.EmptyCommand();
+        }
 
-    private void _parseName() {
-        String nameStr = _optionStrs[0];
-        if (!nameStr.equals(NAME)) CmdException.BadCommandName();
+        List<String> options = new ArrayList<>();
+        String action = "", url = "";
+
+        int matchStart = 0, matchCount = 0, firstOptionStart = -1, lastOptionStart = -1;
+
+        String regexp = "(^| )(\\-|\\-\\-)[a-zA-Z]+[a-zA-Z]*";
+        Pattern pattern = Pattern.compile(regexp);
+        Matcher match = pattern.matcher(_cmd);
+
+        while (match.find(matchStart)) {
+            matchCount++;
+            int optionStart = match.start();
+            if (firstOptionStart == -1) {
+                firstOptionStart = optionStart;
+            }
+            if (lastOptionStart >= 0) {
+                options.add(_cmd.substring(lastOptionStart, optionStart).trim());
+            }
+            lastOptionStart = optionStart;
+            matchStart = match.end();
+        }
+
+        if (firstOptionStart > 0) {
+            action = _cmd.substring(0, firstOptionStart);
+        }
+
+        int urlStart = _cmd.lastIndexOf(" ");
+        if (lastOptionStart >= 0 && options.size() < matchCount) {
+            options.add(_cmd.substring(lastOptionStart, urlStart).trim());
+        }
+
+        url = _cmd.substring(urlStart).trim();
+
+        _action = action;
+        _optionStrs = options;
+        _urls.add(url);
     }
 
     private void _parseOptions() {
-        for (int i = 1; i < _optionStrs.length; i++) {
-            String optionStr = _optionStrs[i];
-            if (optionStr.isBlank()) continue;
+        for (String optionStr : _optionStrs) {
+            if (optionStr.isBlank()) {
+                continue;
+            }
             String[] nameAndValue = _splitOptionNameAndValue(optionStr);
-            if (nameAndValue[0] == null) break;
-            else _options.add(_parseOption(nameAndValue));
+            if (nameAndValue[0] == null) {
+                break;
+            } else {
+                _options.add(_parseOption(nameAndValue));
+            }
         }
     }
 
@@ -119,23 +157,8 @@ public class Cmd {
         return OptionFactory.create(name, value);
     }
 
-    private void _parseUrls() {
-        int urlStartIdx = 1 + _options.size();
-        for (int i = urlStartIdx; i < _optionStrs.length; i++) {
-            _urls.add(_optionStrs[i]);
-        }
-        if (_urls.isEmpty()) CmdException.HasNoUrl();
-    }
-
-    public static void help() {
-        StringBuilder i = new StringBuilder();
-        i.append("OVERVIEW: Copycat, copy everything\n\n");
-        i.append("USAGE: copycat [options] url...\n\n");
-        i.append("OPTIONS:\n");
-        for (Option option : OptionFactory.options()) {
-            String value = option.value() == null ? "<value>" : option.value();
-            i.append(String.format("  --%s|-%s=%s  %s\n", option.name(), option.alias(), value, option.desc()));
-        }
-        System.out.println(i);
+    public static void main(String[] args) {
+        String cmd = "--header=Cooke: token=x, user=s --dir=/a/b/c d/ http://domain.com/path";
+        System.out.println(new Cmd(cmd).toString());
     }
 }

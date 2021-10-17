@@ -63,7 +63,7 @@ public class Http {
         Option dirOption = Options.get(options, DirOption.NAME);
         String baseDir = dirOption != null ? dirOption.value() : "/tmp/copycat/doc/";
         // get dir, name:
-        String name = Html.Title.fromHtml(body.substring(0, 1000)).trim();
+        String name = Html.Title.fromHtml(body).trim();
         String dir = baseDir + name + "/";
         // save html file:
         new File(dir, "_index", File.Ext.HTML).save(body);
