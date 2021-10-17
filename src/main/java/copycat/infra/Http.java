@@ -73,6 +73,8 @@ public class Http {
         List<Image> images = _getImagesInMd(md);
         // save images files:
         md = _downloadImages(dir, md, images);
+        // replace images:
+        md = _replaceImages(md, images);
         // save md file:
         new File(dir, "_index", File.Ext.MD).save(md);
     }
@@ -115,6 +117,8 @@ public class Http {
                 InputStream in = entity.getContent();
                 String filePath = dir + image.fileName();
                 FileUtils.copyInputStreamToFile(in, new java.io.File(filePath));
+                in.close();
+                image.file = image.fileName();
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();
@@ -127,6 +131,13 @@ public class Http {
             } catch (IOException e) {
             }
         }
+    }
+
+    private static String _replaceImages(String md, List<Image> images) {
+        for (Image image : images) {
+            md = md.replace(image.url, image.file);
+        }
+        return md;
     }
 
     private static RequestConfig _reqConf() {

@@ -21,6 +21,8 @@ public class Image {
 
     public final String url;
 
+    public String file;
+
     public Image(String s) {
         int start = -1, idx = -1, end = -1;
         List<String> values = new ArrayList<>();
@@ -50,6 +52,7 @@ public class Image {
             this.title = null;
             this.url = null;
         }
+        this.file = null;
     }
 
     public String fileName() {
