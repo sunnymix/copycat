@@ -4,6 +4,7 @@ import copycat.cmd.option.Option;
 import copycat.cmd.option.Options;
 import copycat.cmd.option.options.HeaderOption;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.config.RequestConfig;
@@ -31,16 +32,27 @@ public class Http {
         }
     }
 
-    private static void _saveFolder(String folder, List<Option> options, String url) {
-        System.out.printf("[FOLDER]%n%s%n%n", folder);
-        String html = _getHtml(options, url);
-        _saveHtml(options, html);
+    private static void _saveFolder(String folderUrl, List<Option> options, String url) {
+        System.out.printf("[FOLDER]%n  %s%n%n", folderUrl);
+        String indexHtml = _getHtml(options, url);
+        String title = _getTitle(indexHtml);
+        _saveHtml(options, indexHtml, title, "_index");
+
+        String folderHtml = _getHtml(options, folderUrl);
+        _saveHtml(options, folderHtml, title, "_folder");
+
+        String folderId = _getId(url);
+        if (StringUtils.isBlank(folderId)) {
+            System.out.printf("[ERROR]%n  folder id is blank! url: %s%n%n", url);
+        } else {
+            List<String> children = Tapd.getChildren(folderId, options, url);
+        }
     }
 
     private static void _saveHtmlAndMd(List<Option> options, String url) throws RuntimeException {
         String html = _getHtml(options, url);
-        _saveHtml(options, html);
-        _saveMd(options, html, url);
+        _saveHtml(options, html, "_index");
+        _saveMd(options, html, "_index", url);
     }
 
     private static String _getHtml(List<Option> options, String url) {
@@ -50,17 +62,17 @@ public class Http {
         _setRequestHeaders(req, options);
         CloseableHttpResponse res = null;
         try {
-            System.out.printf("[HTTP GET]%n%s%n%n", url);
+            System.out.printf("[HTTP GET]%n  %s%n%n", url);
             res = client.execute(req);
             int statusCode = res.getStatusLine().getStatusCode();
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
             if (statusCode == HttpStatus.SC_OK) {
                 html = body;
             } else {
-                System.out.printf("[STATUS]%n%s%n  body:%n%s%n%n", statusCode, body);
+                System.out.printf("[STATUS]%n  %s%n    body:%n    %s%n%n", statusCode, body);
             }
         } catch (Throwable e) {
-            System.out.printf("[ERROR]%nCannot get: %s%n%n!", url);
+            System.out.printf("[ERROR]%n    Cannot get: %s%n%n!", url);
             e.printStackTrace();
         } finally {
             try {
@@ -69,7 +81,7 @@ public class Http {
                 }
                 client.close();
             } catch (IOException e) {
-                System.out.printf("[ERROR]%nClient or Response cannot close!%n%n");
+                System.out.printf("[ERROR]%n    Client or Response cannot close!%n%n");
                 e.printStackTrace();
             }
         }
@@ -86,21 +98,35 @@ public class Http {
         req.setHeader(UA, UA_CHROME);
     }
 
-    private static void _saveHtml(List<Option> options, String html) {
-        new File(_getDir(options, _getTitle(html)), "_index", File.Ext.HTML).save(html);
+    private static void _saveHtml(List<Option> options, String html, String fileName) {
+        _saveHtml(options, html, _getTitle(html), fileName);
     }
 
-    private static void _saveMd(List<Option> options, String html, String refUrl) {
+    private static void _saveHtml(List<Option> options, String html, String parentName, String fileName) {
+        new File(_getDir(options, parentName), fileName, File.Ext.HTML).save(html);
+    }
+
+    private static void _saveMd(List<Option> options, String html, String fileName, String refUrl) {
         String dir = _getDir(options, _getTitle(html));
         String md = Md.fromHtml(html);
         List<Image> images = _getImagesInMd(md, refUrl);
         md = _downloadImages(dir, md, images, options);
         md = _replaceImages(md, images);
-        new File(dir, "_index", File.Ext.MD).save(md);
+        new File(dir, fileName, File.Ext.MD).save(md);
     }
 
     private static String _getTitle(String html) {
         return Html.Title.fromHtml(html).trim();
+    }
+
+    private static String _getId(String url) {
+        if (StringUtils.isNotBlank(url)) {
+            int idx = url.lastIndexOf("/");
+            if (idx >= 0) {
+                return url.substring(idx + 1);
+            }
+        }
+        return null;
     }
 
     private static String _getDir(List<Option> options, String title) {
@@ -154,7 +180,7 @@ public class Http {
                 image.file = image.fileName();
             }
         } catch (Throwable e) {
-            System.out.printf("Cannot download image: %s\n", image.url);
+            System.out.printf("[ERROR]%n    Cannot download image: %s!%n%n", image.url);
             e.printStackTrace();
         } finally {
             try {

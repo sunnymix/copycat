@@ -48,10 +48,10 @@ public class Cmd {
     public void print() {
         StringBuilder s = new StringBuilder();
         s.append("[CMD]").append("\n");
-        s.append("Optional: ").append(_cmd).append("\n");
-        s.append("Action: ").append(_action).append("\n");
-        s.append("Urls: ").append(_urls).append("\n");
-        s.append("Options: ").append("\n");
+        s.append("  Optional: ").append(_cmd).append("\n");
+        s.append("  Action: ").append(_action).append("\n");
+        s.append("  Urls: ").append(_urls).append("\n");
+        s.append("  Options: ").append("\n");
         for (Option option : _options) {
             s.append("    ").append(option.name()).append(": ").append(option.value()).append("\n");
         }
