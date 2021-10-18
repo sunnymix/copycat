@@ -22,13 +22,25 @@ public class Http {
     public static final String UA = "User-Agent";
     public static final String UA_CHROME = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36";
 
-    public static void getFolder(List<Option> options, String url) {
-
+    public static void save(List<Option> options, String url) {
+        String folder = Options.getFolder(options);
+        if (folder != null) {
+            _saveFolder(folder, options, url);
+        } else {
+            _saveHtmlAndMd(options, url);
+        }
     }
 
-    public static void getHtmlAndMd(List<Option> options, String url) throws RuntimeException {
+    private static void _saveFolder(String folder, List<Option> options, String url) {
+        System.out.printf("[FOLDER]%n%s%n%n", folder);
         String html = _getHtml(options, url);
-        _saveHtmlAndMd(options, html, url);
+        _saveHtml(options, html);
+    }
+
+    private static void _saveHtmlAndMd(List<Option> options, String url) throws RuntimeException {
+        String html = _getHtml(options, url);
+        _saveHtml(options, html);
+        _saveMd(options, html, url);
     }
 
     private static String _getHtml(List<Option> options, String url) {
@@ -74,24 +86,27 @@ public class Http {
         req.setHeader(UA, UA_CHROME);
     }
 
-    private static void _saveHtmlAndMd(List<Option> options, String body, String url) {
-        String dirOption = Options.getDir(options);
-        String baseDir = dirOption != null ? dirOption : "/tmp/copycat/doc/";
-        // get dir, name:
-        String name = Html.Title.fromHtml(body).trim();
-        String dir = baseDir + name + "/";
-        // save html file:
-        new File(dir, "_index", File.Ext.HTML).save(body);
-        // get md:
-        String md = Md.fromHtml(body);
-        // get images in md:
-        List<Image> images = _getImagesInMd(md, url);
-        // save images files:
+    private static void _saveHtml(List<Option> options, String html) {
+        new File(_getDir(options, _getTitle(html)), "_index", File.Ext.HTML).save(html);
+    }
+
+    private static void _saveMd(List<Option> options, String html, String refUrl) {
+        String dir = _getDir(options, _getTitle(html));
+        String md = Md.fromHtml(html);
+        List<Image> images = _getImagesInMd(md, refUrl);
         md = _downloadImages(dir, md, images, options);
-        // replace images:
         md = _replaceImages(md, images);
-        // save md file:
         new File(dir, "_index", File.Ext.MD).save(md);
+    }
+
+    private static String _getTitle(String html) {
+        return Html.Title.fromHtml(html).trim();
+    }
+
+    private static String _getDir(List<Option> options, String title) {
+        String dir = Options.getDir(options);
+        String baseDir = dir != null ? dir : "/tmp/copycat/doc/";
+        return baseDir + title + "/";
     }
 
     private static List<Image> _getImagesInMd(String md, String ref) {
@@ -166,18 +181,17 @@ public class Http {
     }
 
     public static void main(String[] args) {
-//        String s = String.join("\n", new String[]{
-//                "![](https://pubimg.xingren.com/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)",
-//                "![num1](https://pubimg.xingren.com/6bcb5fb9-12b4-40f9-a4cf-cd1ecf59e56a.png);",
-//                "![num2](https://pubimg.xingren.com/ab41f8cc-dbc0-4a9b-8b77-1ce597114db8.png);",
-//                "![num3](https://pubimg.xingren.com/4a67d3c2-fa3b-456f-9c52-b3af2d46bb2b.png);"
-//        });
-//
-//        List<Image> images = _getImagesInMd(s, "https://pubimg.xingren.com");
-//        for (Image image : images) {
-//            System.out.println(image);
-//        }
+        /*String s = String.join("\n", new String[]{
+                "![](https://pubimg.xingren.com/c64c6f4b-92ed-4efc-a9b8-1cc26d4a5157.png)",
+                "![num1](https://pubimg.xingren.com/6bcb5fb9-12b4-40f9-a4cf-cd1ecf59e56a.png);",
+                "![num2](https://pubimg.xingren.com/ab41f8cc-dbc0-4a9b-8b77-1ce597114db8.png);",
+                "![num3](https://pubimg.xingren.com/4a67d3c2-fa3b-456f-9c52-b3af2d46bb2b.png);"
+        });
 
+        List<Image> images = _getImagesInMd(s, "https://pubimg.xingren.com");
+        for (Image image : images) {
+            System.out.println(image);
+        }*/
         _downloadImage("/tmp/copycat/doc/", new Image("![](http://img.llc687.top/uPic/截屏2020-05-31下午2.53.34.png)", "https://pubimg.xingren.com"), new ArrayList<>());
     }
 }
