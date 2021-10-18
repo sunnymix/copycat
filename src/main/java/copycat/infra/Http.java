@@ -2,12 +2,10 @@ package copycat.infra;
 
 import copycat.cmd.option.Option;
 import copycat.cmd.option.Options;
-import copycat.cmd.option.options.DirOption;
 import copycat.cmd.option.options.HeaderOption;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -24,47 +22,60 @@ public class Http {
     public static final String UA = "User-Agent";
     public static final String UA_CHROME = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36";
 
+    public static void getFolder(List<Option> options, String url) {
+    }
+
     public static void getHtmlAndMd(List<Option> options, String url) throws RuntimeException {
+        String html = _getHtml(options, url);
+        _saveHtmlAndMd(options, html, url);
+    }
+
+    private static String _getHtml(List<Option> options, String url) {
+        String html = null;
         CloseableHttpClient client = HttpClients.createDefault();
-        HttpGet get = new HttpGet(url);
-        _setRequestHeaders(get, options);
+        HttpGet req = new HttpGet(url);
+        _setRequestHeaders(req, options);
         CloseableHttpResponse res = null;
         try {
             System.out.printf("[HTTP GET]%n%s%n%n", url);
-            res = client.execute(get);
+            res = client.execute(req);
             int statusCode = res.getStatusLine().getStatusCode();
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
-            System.out.printf("[STATUS CODE]%n%s%n%n", statusCode);
             if (statusCode == HttpStatus.SC_OK) {
-                _saveHtmlAndMd(options, body, url);
+                html = body;
             } else {
-                System.out.printf("[STATUS CODE]%n%s%n" + statusCode);
+                System.out.printf("[STATUS]%n%s%n  body:%n%s%n%n", statusCode, body);
             }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            System.out.printf("[ERROR]%nCannot get: %s%n%n!", url);
             e.printStackTrace();
         } finally {
             try {
-                if (res != null) res.close();
+                if (res != null) {
+                    res.close();
+                }
                 client.close();
             } catch (IOException e) {
+                System.out.printf("[ERROR]%nClient or Response cannot close!%n%n");
+                e.printStackTrace();
             }
         }
+        return html;
     }
 
-    private static void _setRequestHeaders(HttpGet get, List<Option> options) {
+    private static void _setRequestHeaders(HttpGet req, List<Option> options) {
         options.stream().filter(o -> o instanceof HeaderOption).forEach(o -> {
             String[] nameAndValue = ((HeaderOption) o).parseNameAndValue();
             if (nameAndValue.length == 2) {
-                get.setHeader(nameAndValue[0], nameAndValue[1]);
+                req.setHeader(nameAndValue[0], nameAndValue[1]);
             }
         });
+        req.setHeader(UA, UA_CHROME);
     }
 
     private static void _saveHtmlAndMd(List<Option> options, String body, String url) {
-        Option dirOption = Options.get(options, DirOption.NAME);
-        String baseDir = dirOption != null ? dirOption.value() : "/tmp/copycat/doc/";
+        String dirOption = Options.getDir(options);
+        String baseDir = dirOption != null ? dirOption : "/tmp/copycat/doc/";
         // get dir, name:
         String name = Html.Title.fromHtml(body).trim();
         String dir = baseDir + name + "/";

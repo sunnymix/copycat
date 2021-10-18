@@ -2,6 +2,7 @@ package copycat.cmd.option;
 
 import copycat.cmd.CmdException;
 import copycat.cmd.option.options.DirOption;
+import copycat.cmd.option.options.FolderOption;
 import copycat.cmd.option.options.HeaderOption;
 import copycat.cmd.option.options.ProtocolOption;
 
@@ -14,6 +15,7 @@ public class OptionFactory {
         add(new ProtocolOption(null));
         add(new HeaderOption(null));
         add(new DirOption(null));
+        add(new FolderOption(null));
     }
 
     private static final Map<String, Option> _options;
