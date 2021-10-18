@@ -4,7 +4,6 @@ import copycat.cmd.CmdException;
 import copycat.cmd.option.options.DirOption;
 import copycat.cmd.option.options.FolderOption;
 import copycat.cmd.option.options.HeaderOption;
-import copycat.cmd.option.options.ProtocolOption;
 
 import java.lang.reflect.Constructor;
 import java.util.*;
@@ -12,7 +11,6 @@ import java.util.*;
 public class OptionFactory {
     static {
         _options = new HashMap<>();
-        add(new ProtocolOption(null));
         add(new HeaderOption(null));
         add(new DirOption(null));
         add(new FolderOption(null));
