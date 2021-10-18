@@ -30,12 +30,15 @@ public class Http {
         _setRequestHeaders(get, options);
         CloseableHttpResponse res = null;
         try {
+            System.out.printf("[HTTP GET]%n%s%n%n", url);
             res = client.execute(get);
             int statusCode = res.getStatusLine().getStatusCode();
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
-            System.out.println("Stats: " + statusCode);
+            System.out.printf("[STATUS CODE]%n%s%n%n", statusCode);
             if (statusCode == HttpStatus.SC_OK) {
                 _saveHtmlAndMd(options, body, url);
+            } else {
+                System.out.printf("[STATUS CODE]%n%s%n" + statusCode);
             }
         } catch (ClientProtocolException e) {
             e.printStackTrace();

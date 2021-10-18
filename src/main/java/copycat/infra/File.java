@@ -3,6 +3,7 @@ package copycat.infra;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Locale;
 
 public class File {
     public final String dir;
@@ -30,7 +31,7 @@ public class File {
     }
 
     public void save(String content) {
-        System.out.printf("Save file: %s%n", filePath());
+        System.out.printf("[%S]%n%s%n%n", ext.id.toUpperCase(Locale.ROOT), filePath());
         _resetFile();
         try (PrintWriter writer = new PrintWriter(filePath(), StandardCharsets.UTF_8)) {
             writer.println(content);

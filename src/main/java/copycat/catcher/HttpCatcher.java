@@ -13,7 +13,6 @@ public class HttpCatcher implements Catcher {
     }
 
     public static void get(List<Option> options, String url) {
-        System.out.println("[HTT_CAT_GET] " + url + "\n");
         Http.getHtmlAndMd(options, url);
     }
 }

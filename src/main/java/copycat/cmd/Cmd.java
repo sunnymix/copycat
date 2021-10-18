@@ -47,9 +47,7 @@ public class Cmd {
 
     public void print() {
         StringBuilder s = new StringBuilder();
-        s.append("\n");
-        s.append("====================").append("\n");
-        s.append("Cmd").append("\n");
+        s.append("[CMD]").append("\n");
         s.append("Optional: ").append(_cmd).append("\n");
         s.append("Action: ").append(_action).append("\n");
         s.append("Urls: ").append(_urls).append("\n");
@@ -57,8 +55,8 @@ public class Cmd {
         for (Option option : _options) {
             s.append("    ").append(option.name()).append(": ").append(option.value()).append("\n");
         }
-        s.append("====================").append("\n");
-        System.out.println(s);
+        s.append("\n");
+        System.out.print(s);
     }
 
     private void _reset() {
