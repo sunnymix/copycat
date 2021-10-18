@@ -123,9 +123,8 @@ public class Http {
                 in.close();
                 image.file = image.fileName();
             }
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            System.out.printf("Cannot download image: %s\n", image.url);
             e.printStackTrace();
         } finally {
             try {
@@ -138,7 +137,9 @@ public class Http {
 
     private static String _replaceImages(String md, List<Image> images) {
         for (Image image : images) {
-            md = md.replace(image.originalUrl, image.file);
+            if (image.file != null && !image.file.isBlank()) {
+                md = md.replace(image.originalUrl, image.file);
+            }
         }
         return md;
     }
