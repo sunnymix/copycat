@@ -71,6 +71,12 @@ public class Tapd {
         List<String> ids = new ArrayList<>();
         for (String child : children) {
             String id = _findProperty("id", child, 0).trim();
+            if (id.startsWith("\"")) {
+                id = id.substring(1).trim();
+            }
+            if (id.endsWith("\"")) {
+                id = id.substring(0, id.length() - 1).trim();
+            }
             if (StringUtils.isNotBlank(id)) {
                 ids.add(id);
             }

@@ -23,6 +23,9 @@ public class Http {
     public static final String UA = "User-Agent";
     public static final String UA_CHROME = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.71 Safari/537.36";
 
+    private static final String INDEX = "_index";
+    private static final String FOLDER = "_folder";
+
     public static void save(List<Option> options, String url) {
         String folder = Options.getFolder(options);
         if (folder != null) {
@@ -33,30 +36,46 @@ public class Http {
     }
 
     private static void _saveFolder(String folderUrl, List<Option> options, String url) {
-        System.out.printf("[FOLDER]%n%s%n%n", folderUrl);
+        System.out.printf("[FOLDER]%n" + "%s%n%n", folderUrl);
         String indexHtml = _getHtml(options, url);
 
         String title = _getTitle(indexHtml);
         String dir = _getDir(options, title);
-        _saveHtml(dir, "_index", indexHtml);
+        _saveHtml(dir, INDEX, indexHtml);
+        _saveMd(dir, INDEX, indexHtml, url, options);
 
         String folderHtml = _getHtml(options, folderUrl);
-        _saveHtml(dir, "_folder", folderHtml);
+        _saveHtml(dir, FOLDER, folderHtml);
 
         String folderId = _getId(url);
         if (StringUtils.isBlank(folderId)) {
-            System.out.printf("[ERROR]%nfolder id is blank! url: %s%n%n", url);
+            System.out.printf("[ERROR]%n" + "folder id is blank! url: %s%n%n", url);
         } else {
-            List<String> children = Tapd.getChildren(folderId, options, folderHtml);
+            List<String> childrenId = Tapd.getChildren(folderId, options, folderHtml);
+            if (!childrenId.isEmpty()) {
+                for (String childId : childrenId) {
+                    String childUrl = url.replace(folderId, childId);
+                    System.out.printf("[GET CHILD]%n" + "%s%n%n", childUrl);
+                    _saveChildHtmlAndMd(options, childUrl, dir);
+                }
+            }
         }
+    }
+
+    private static void _saveChildHtmlAndMd(List<Option> options, String url, String dir) throws RuntimeException {
+        String html = _getHtml(options, url);
+        String title = _getTitle(html);
+        dir = dir + title + "/";
+        _saveHtml(dir, INDEX, html);
+        _saveMd(dir, INDEX, html, url, options);
     }
 
     private static void _saveHtmlAndMd(List<Option> options, String url) throws RuntimeException {
         String html = _getHtml(options, url);
         String title = _getTitle(html);
         String dir = _getDir(options, title);
-        _saveHtml(dir, "_index", html);
-        _saveMd(dir, "_index", html, url, options);
+        _saveHtml(dir, INDEX, html);
+        _saveMd(dir, INDEX, html, url, options);
     }
 
     private static String _getHtml(List<Option> options, String url) {
