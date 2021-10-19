@@ -4,12 +4,16 @@ import copycat.cmd.option.Option;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Stack;
 
 import static copycat.infra.Tapd.Pair.*;
 
 public class Tapd {
     public static List<String> getChildren(String folderId, List<Option> options, String html) {
+        List<String> childrenId = new ArrayList<>();
         System.out.printf("[FOLDER CHILDREN]%n  folderId: %s%n%n", folderId);
         int folderIdIdx = html.indexOf("baseZNodesForLoadMoreNodes");
         if (folderIdIdx > 0) {
@@ -22,11 +26,10 @@ public class Tapd {
             System.out.printf("[CHILDREN STR]%n%s%n%n", childrenStr);
             List<String> children = _findObjs(childrenStr);
             System.out.printf("[CHILDREN LIST]%n%s%n%n", String.join("\n", children));
-            List<String> childrenId = _findChildrenId(children);
+            childrenId = _findChildrenId(children);
             System.out.printf("[CHILDREN ID]%n%s%n%n", String.join("\n", childrenId));
         }
-
-        return Arrays.asList("null");
+        return childrenId;
     }
 
     private static String _findParent(String json, int from) {

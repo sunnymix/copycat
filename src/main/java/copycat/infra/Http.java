@@ -33,13 +33,15 @@ public class Http {
     }
 
     private static void _saveFolder(String folderUrl, List<Option> options, String url) {
-        System.out.printf("[FOLDER]%n  %s%n%n", folderUrl);
+        System.out.printf("[FOLDER]%n%s%n%n", folderUrl);
         String indexHtml = _getHtml(options, url);
+
         String title = _getTitle(indexHtml);
-        _saveHtml(options, indexHtml, title, "_index");
+        String dir = _getDir(options, title);
+        _saveHtml(dir, "_index", indexHtml);
 
         String folderHtml = _getHtml(options, folderUrl);
-        _saveHtml(options, folderHtml, title, "_folder");
+        _saveHtml(dir, "_folder", folderHtml);
 
         String folderId = _getId(url);
         if (StringUtils.isBlank(folderId)) {
@@ -51,8 +53,10 @@ public class Http {
 
     private static void _saveHtmlAndMd(List<Option> options, String url) throws RuntimeException {
         String html = _getHtml(options, url);
-        _saveHtml(options, html, "_index");
-        _saveMd(options, html, "_index", url);
+        String title = _getTitle(html);
+        String dir = _getDir(options, title);
+        _saveHtml(dir, "_index", html);
+        _saveMd(dir, "_index", html, url, options);
     }
 
     private static String _getHtml(List<Option> options, String url) {
@@ -62,17 +66,17 @@ public class Http {
         _setRequestHeaders(req, options);
         CloseableHttpResponse res = null;
         try {
-            System.out.printf("[HTTP GET]%n  %s%n%n", url);
+            System.out.printf("[HTTP GET]%n%s%n%n", url);
             res = client.execute(req);
             int statusCode = res.getStatusLine().getStatusCode();
             String body = EntityUtils.toString(res.getEntity(), "UTF-8");
             if (statusCode == HttpStatus.SC_OK) {
                 html = body;
             } else {
-                System.out.printf("[STATUS]%n  %s%n    body:%n    %s%n%n", statusCode, body);
+                System.out.printf("[STATUS]%n%s%n    body:%n    %s%n%n", statusCode, body);
             }
         } catch (Throwable e) {
-            System.out.printf("[ERROR]%n    Cannot get: %s%n%n!", url);
+            System.out.printf("[ERROR]%nCannot get: %s%n%n!", url);
             e.printStackTrace();
         } finally {
             try {
@@ -81,7 +85,7 @@ public class Http {
                 }
                 client.close();
             } catch (IOException e) {
-                System.out.printf("[ERROR]%n    Client or Response cannot close!%n%n");
+                System.out.printf("[ERROR]%nClient or Response cannot close!%n%n");
                 e.printStackTrace();
             }
         }
@@ -98,16 +102,11 @@ public class Http {
         req.setHeader(UA, UA_CHROME);
     }
 
-    private static void _saveHtml(List<Option> options, String html, String fileName) {
-        _saveHtml(options, html, _getTitle(html), fileName);
+    private static void _saveHtml(String dir, String fileName, String html) {
+        new File(dir, fileName, File.Ext.HTML).save(html);
     }
 
-    private static void _saveHtml(List<Option> options, String html, String parentName, String fileName) {
-        new File(_getDir(options, parentName), fileName, File.Ext.HTML).save(html);
-    }
-
-    private static void _saveMd(List<Option> options, String html, String fileName, String refUrl) {
-        String dir = _getDir(options, _getTitle(html));
+    private static void _saveMd(String dir, String fileName, String html, String refUrl, List<Option> options) {
         String md = Md.fromHtml(html);
         List<Image> images = _getImagesInMd(md, refUrl);
         md = _downloadImages(dir, md, images, options);
