@@ -14,7 +14,7 @@ import static copycat.infra.Tapd.Pair.*;
 public class Tapd {
     public static List<String> getChildren(String folderId, List<Option> options, String html) {
         List<String> childrenId = new ArrayList<>();
-        System.out.printf("[FOLDER CHILDREN]%n  folderId: %s%n%n", folderId);
+        // System.out.printf("[FOLDER CHILDREN]%n" + "folderId: %s%n%n", folderId);
         int folderIdIdx = html.indexOf("baseZNodesForLoadMoreNodes");
         if (folderIdIdx > 0) {
             folderIdIdx = html.indexOf("id:\"" + folderId + "\"", folderIdIdx);
@@ -23,11 +23,11 @@ public class Tapd {
             String json = _findParent(html, folderIdIdx);
             json = StringEscapeUtils.unescapeJava(json);
             String childrenStr = _findProperty("children", json, 0);
-            System.out.printf("[CHILDREN STR]%n%s%n%n", childrenStr);
+            // System.out.printf("[CHILDREN STR]%n" + "%s%n%n", childrenStr);
             List<String> children = _findObjs(childrenStr);
-            System.out.printf("[CHILDREN LIST]%n%s%n%n", String.join("\n", children));
+            // System.out.printf("[CHILDREN LIST]%n" + "%s%n%n", String.join("\n", children));
             childrenId = _findChildrenId(children);
-            System.out.printf("[CHILDREN ID]%n%s%n%n", String.join("\n", childrenId));
+            System.out.printf("[CHILDREN ID]%n" + "%s%n%n", String.join("\n", childrenId));
         }
         return childrenId;
     }

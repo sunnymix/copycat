@@ -45,7 +45,7 @@ public class Http {
 
         String folderId = _getId(url);
         if (StringUtils.isBlank(folderId)) {
-            System.out.printf("[ERROR]%n  folder id is blank! url: %s%n%n", url);
+            System.out.printf("[ERROR]%nfolder id is blank! url: %s%n%n", url);
         } else {
             List<String> children = Tapd.getChildren(folderId, options, folderHtml);
         }
@@ -73,10 +73,10 @@ public class Http {
             if (statusCode == HttpStatus.SC_OK) {
                 html = body;
             } else {
-                System.out.printf("[STATUS]%n%s%n    body:%n    %s%n%n", statusCode, body);
+                System.out.printf("[STATUS]%n" + "%s%n" + "body:%n" + "%s%n%n", statusCode, body);
             }
         } catch (Throwable e) {
-            System.out.printf("[ERROR]%nCannot get: %s%n%n!", url);
+            System.out.printf("[ERROR]%n" + "Cannot get: %s%n%n!", url);
             e.printStackTrace();
         } finally {
             try {
@@ -85,7 +85,7 @@ public class Http {
                 }
                 client.close();
             } catch (IOException e) {
-                System.out.printf("[ERROR]%nClient or Response cannot close!%n%n");
+                System.out.printf("[ERROR]%n" + "Client or Response cannot close!%n%n");
                 e.printStackTrace();
             }
         }
@@ -179,7 +179,7 @@ public class Http {
                 image.file = image.fileName();
             }
         } catch (Throwable e) {
-            System.out.printf("[ERROR]%n    Cannot download image: %s!%n%n", image.url);
+            System.out.printf("[ERROR]%n" + "Cannot download image: %s!%n%n", image.url);
             e.printStackTrace();
         } finally {
             try {
