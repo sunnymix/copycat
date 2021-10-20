@@ -24,10 +24,12 @@ public class DeepSave {
     private static void _saveChildren(SavePage savePage, Catalog catalog, List<Option> options) {
         List<String> childrenId = catalog.getChildrenId(savePage.pageId);
         if (!childrenId.isEmpty()) {
-            for (String childId : childrenId) {
+            for (Integer i = 1; i <= childrenId.size(); i++) {
+                String childId = childrenId.get(i - 1);
                 String childUrl = savePage.childUrl(childId);
                 System.out.printf("[GET CHILD]%n" + "%s%n%n", childUrl);
-                _savePageAndChildren(savePage.pageDir, childUrl, catalog, options);
+                String prefix = (i < 10 ? "0" + i : i.toString()) + " ";
+                _savePageAndChildren(savePage.pageDir + prefix, childUrl, catalog, options);
             }
         }
     }

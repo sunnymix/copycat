@@ -179,7 +179,12 @@ public class Http {
     private static void _downloadImages(String dir, List<Image> images, List<Option> options) {
         if (!images.isEmpty()) {
             for (Image image : images) {
-                _downloadImage(dir, image, options);
+                try {
+                    _downloadImage(dir, image, options);
+                } catch (Throwable e) {
+                    System.out.printf("[ERROR]%n" + "Cannot download image: %s!%n%n", image.url);
+                    e.printStackTrace();
+                }
             }
         }
     }
