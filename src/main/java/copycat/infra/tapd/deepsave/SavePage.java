@@ -51,6 +51,10 @@ public class SavePage {
         this.options = options;
     }
 
+    public String childUrl(String childId) {
+        return pageUrl.replace(pageId, childId);
+    }
+
     private void _saveHtml() {
         new File(pageDir, INDEX, File.Ext.HTML).save(html);
     }

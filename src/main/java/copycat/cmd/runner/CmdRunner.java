@@ -9,9 +9,10 @@ import java.util.List;
 public class CmdRunner {
     public static void run(List<Option> options, List<String> urls) {
         if (!urls.isEmpty()) {
-            DeepSave.savePage(
+            DeepSave.save(
                     Options.getDir(options),
                     urls.get(0),
+                    Options.getCatalog(options),
                     options
             );
             // Http.save(options, urls.get(0));

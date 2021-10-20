@@ -51,7 +51,7 @@ public class Http {
         if (StringUtils.isBlank(folderId)) {
             System.out.printf("[ERROR]%n" + "folder id is blank! url: %s%n%n", url);
         } else {
-            List<String> childrenId = Tapd.getChildren(folderId, options, folderHtml);
+            List<String> childrenId = Tapd.getChildrenId(folderId, folderHtml);
             if (!childrenId.isEmpty()) {
                 for (String childId : childrenId) {
                     String childUrl = url.replace(folderId, childId);

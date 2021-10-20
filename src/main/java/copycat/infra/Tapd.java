@@ -1,6 +1,5 @@
 package copycat.infra;
 
-import copycat.cmd.option.Option;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,15 +11,15 @@ import java.util.Stack;
 import static copycat.infra.Tapd.Pair.*;
 
 public class Tapd {
-    public static List<String> getChildren(String folderId, List<Option> options, String html) {
+    public static List<String> getChildrenId(String parentId, String text) {
         List<String> childrenId = new ArrayList<>();
         // System.out.printf("[FOLDER CHILDREN]%n" + "folderId: %s%n%n", folderId);
-        int folderIdIdx = html.indexOf("baseZNodesForLoadMoreNodes");
-        if (folderIdIdx > 0) {
-            folderIdIdx = html.indexOf("id:\"" + folderId + "\"", folderIdIdx);
+        int catalogStartIdx = text.indexOf("baseZNodesForLoadMoreNodes");
+        if (catalogStartIdx > 0) {
+            catalogStartIdx = text.indexOf("id:\"" + parentId + "\"", catalogStartIdx);
         }
-        if (folderIdIdx > 0) {
-            String json = _findParent(html, folderIdIdx);
+        if (catalogStartIdx > 0) {
+            String json = _findParent(text, catalogStartIdx);
             json = StringEscapeUtils.unescapeJava(json);
             String childrenStr = _findProperty("children", json, 0);
             // System.out.printf("[CHILDREN STR]%n" + "%s%n%n", childrenStr);
@@ -55,7 +54,7 @@ public class Tapd {
 
     private static List<String> _findObjs(String json) {
         List<String> objs = new ArrayList<>();
-        while (!json.isEmpty()) {
+        while (json != null && !json.isEmpty()) {
             Range range = _findPairRange(json, '{', '}');
             if (range.ok()) {
                 objs.add(json.substring(range.left, range.right));
