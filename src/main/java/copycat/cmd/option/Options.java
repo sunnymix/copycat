@@ -10,7 +10,7 @@ public class Options {
         return _getStr(options, DirOption.NAME);
     }
 
-    public static String getFolder(List<Option> options) {
+    public static String getCatalog(List<Option> options) {
         return _getStr(options, FolderOption.NAME);
     }
 

@@ -1,11 +1,13 @@
 package copycat.common;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-public class UrlUtils {
+public class Url {
     /**
      * Get site base as protocol://domain
      *
@@ -35,5 +37,16 @@ public class UrlUtils {
         } catch (Exception e) {
         }
         return s;
+    }
+
+    public static String lastParam(String url) {
+        String param = null;
+        if (StringUtils.isNotBlank(url)) {
+            int idx = url.lastIndexOf("/");
+            if (idx >= 0) {
+                param = url.substring(idx + 1);
+            }
+        }
+        return param;
     }
 }

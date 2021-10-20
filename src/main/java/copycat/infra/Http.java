@@ -27,7 +27,7 @@ public class Http {
     private static final String FOLDER = "_folder";
 
     public static void save(List<Option> options, String url) {
-        String folder = Options.getFolder(options);
+        String folder = Options.getCatalog(options);
         if (folder != null) {
             _saveFolder(folder, options, url);
         } else {
@@ -76,6 +76,10 @@ public class Http {
         String dir = _getDir(options, title);
         _saveHtml(dir, INDEX, html);
         _saveMd(dir, INDEX, html, url, options);
+    }
+
+    public static String get(String url, List<Option> options) {
+        return _getHtml(options, url);
     }
 
     private static String _getHtml(List<Option> options, String url) {
@@ -128,7 +132,7 @@ public class Http {
     private static void _saveMd(String dir, String fileName, String html, String refUrl, List<Option> options) {
         String md = Md.fromHtml(html);
         List<Image> images = _getImagesInMd(md, refUrl);
-        md = _downloadImages(dir, md, images, options);
+        _downloadImages(dir, images, options);
         md = _replaceImages(md, images);
         new File(dir, fileName, File.Ext.MD).save(md);
     }
@@ -168,13 +172,16 @@ public class Http {
         return images;
     }
 
-    private static String _downloadImages(String dir, String md, List<Image> images, List<Option> options) {
+    public static void saveImages(String dir, List<Image> images, List<Option> options) {
+        _downloadImages(dir, images, options);
+    }
+
+    private static void _downloadImages(String dir, List<Image> images, List<Option> options) {
         if (!images.isEmpty()) {
             for (Image image : images) {
                 _downloadImage(dir, image, options);
             }
         }
-        return md;
     }
 
     private static void _downloadImage(String dir, Image image, List<Option> options) {

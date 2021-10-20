@@ -1,6 +1,6 @@
 package copycat.infra;
 
-import copycat.common.UrlUtils;
+import copycat.common.Url;
 import org.apache.commons.lang3.StringEscapeUtils;
 
 public class Md {
@@ -46,7 +46,7 @@ public class Md {
     private static String _decode(String s) {
         s = _decodeEOL(s);
         s = _decodeUnicode(s);
-        s = UrlUtils.decode(s);
+        s = Url.decode(s);
         return s;
     }
 

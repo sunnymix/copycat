@@ -1,6 +1,6 @@
 package copycat.infra;
 
-import copycat.common.UrlUtils;
+import copycat.common.Url;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -48,16 +48,16 @@ public class Image {
             }
         }
         // init properties:
-        this.ref = UrlUtils.decode(ref);
+        this.ref = Url.decode(ref);
         this.file = null;
         if (start >= 0 && idx >= 0 && end > start && values.size() == 2) {
             this.start = start;
             this.end = end;
             this.str = s.substring(this.start, this.end);
             this.title = values.get(0);
-            this.originalUrl = UrlUtils.decode(values.get(1));
+            this.originalUrl = Url.decode(values.get(1));
             this.url = _fillUrlSite(this.originalUrl, ref).trim();
-            this.attachInRef = UrlUtils.sameSite(this.url, ref);
+            this.attachInRef = Url.sameSite(this.url, ref);
         } else {
             this.start = -1;
             this.end = -1;
@@ -98,7 +98,7 @@ public class Image {
 
     private String _fillUrlSite(String url, String ref) {
         if (!url.startsWith("http") || url.startsWith("/")) {
-            return UrlUtils.getSite(ref) + url;
+            return Url.getSite(ref) + url;
         }
         return url;
     }
