@@ -2,7 +2,7 @@ package copycat.cmd.option;
 
 import copycat.cmd.CmdException;
 import copycat.cmd.option.options.DirOption;
-import copycat.cmd.option.options.FolderOption;
+import copycat.cmd.option.options.CatalogOption;
 import copycat.cmd.option.options.HeaderOption;
 
 import java.lang.reflect.Constructor;
@@ -13,7 +13,7 @@ public class OptionFactory {
         _options = new HashMap<>();
         add(new HeaderOption(null));
         add(new DirOption(null));
-        add(new FolderOption(null));
+        add(new CatalogOption(null));
     }
 
     private static final Map<String, Option> _options;

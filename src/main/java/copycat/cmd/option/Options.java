@@ -1,7 +1,7 @@
 package copycat.cmd.option;
 
 import copycat.cmd.option.options.DirOption;
-import copycat.cmd.option.options.FolderOption;
+import copycat.cmd.option.options.CatalogOption;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ public class Options {
     }
 
     public static String getCatalog(List<Option> options) {
-        return _getStr(options, FolderOption.NAME);
+        return _getStr(options, CatalogOption.NAME);
     }
 
     public static String _getStr(List<Option> options, String name) {
