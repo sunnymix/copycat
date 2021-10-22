@@ -12,7 +12,7 @@ public class Catalog {
 
     final String dir, catalogUrl, html;
 
-    public static Catalog save(String dir, String catalogUrl, List<Option> options) {
+    public static Catalog of(String dir, String catalogUrl, List<Option> options) {
         // ========== Properties ==========
         String html = Http.get(catalogUrl, options);
         // ========== Object ==========
